@@ -275,7 +275,7 @@ export class DraftsStore {
 
                 }
             }, 1000);
-            let initialValue = 30;
+            let initialValue = 500;
             let countdown = this.countdowns.get(draftId);
             if (countdown !== undefined) {
                 initialValue = countdown.value;
