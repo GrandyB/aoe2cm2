@@ -299,6 +299,8 @@ export const DraftServer = {
                 } else if (Object.keys(socket.rooms).includes(roomGuest)) {
                     wasAlreadyReady = draftsStore.setPlayerReady(draftId, Player.GUEST);
                     assignedRole = Player.GUEST;
+                } else if (Object.keys(socket.rooms).includes(roomMaster)) {
+                    assignedRole = Player.MASTER;
                 }
                 logger.info("Player indicates they are ready: %s", assignedRole, {draftId});
                 if (!wasAlreadyReady && draftsStore.playersAreReady(draftId)) {

@@ -11,6 +11,7 @@ export function mapStateToProps(state: ApplicationState) {
         visible: state.modal.showRoleModal,
         hostConnected: state.draft.hostConnected,
         guestConnected: state.draft.guestConnected,
+        masterconnected: state.draft.masterConnected,
     };
 }
 

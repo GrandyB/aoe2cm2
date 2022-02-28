@@ -115,6 +115,10 @@ export class DraftsStore {
                 draft.guestConnected = true;
                 break;
             case Player.MASTER:
+                draft.hostConnected = true;
+                draft.guestConnected = true;
+                draft.hostReady = true;
+                draft.guestReady = true;
                 draft.masterConnected = true;
                 break;
         }
@@ -151,6 +155,12 @@ export class DraftsStore {
                 this.pauseCountdown(draftId);
                 break;
             case Player.MASTER:
+                draft.nameHost = '…';
+                draft.nameGuest = '…';
+                draft.hostConnected = false;
+                draft.hostReady = false;
+                draft.guestConnected = false;
+                draft.guestReady = false;
                 draft.masterConnected = false;
                 this.pauseCountdown(draftId);
                 break;
