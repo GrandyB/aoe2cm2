@@ -27,6 +27,7 @@ interface IProps extends WithTranslation, RouteComponentProps<any> {
     nameGuest: string;
     hostConnected: boolean;
     guestConnected: boolean;
+    masterConnected: boolean;
     whoAmI?: Player;
     ownName: string | null;
     preset: Preset;

@@ -5,6 +5,7 @@ import ActionType, {actionTypeFromAction} from "../constants/ActionType";
 import PlayerEvent from "../models/PlayerEvent";
 import {Dispatch} from "redux";
 import * as actions from "../actions";
+import Player from '../constants/Player';
 
 
 export function mapStateToProps(state: ApplicationState) {
@@ -21,7 +22,7 @@ export function mapStateToProps(state: ApplicationState) {
                 turn = state.draft.preset.turns[index - 1];
             }
         }
-        if (turn.executingPlayer === state.ownProperties.whoAmI) {
+        if (turn.executingPlayer === state.ownProperties.whoAmI || state.ownProperties.whoAmI === Player.MASTER) {
             triggerAction = actionTypeFromAction(turn.action);
             player = turn.player;
         }

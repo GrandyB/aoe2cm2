@@ -16,6 +16,7 @@ import {default as ModelDraft} from "../../models/Draft";
 import PlayerEvent from "../../models/PlayerEvent";
 import AdminEvent from "../../models/AdminEvent";
 import RestartIcon from "mdi-react/RestartIcon";
+import { CountdownProperties } from "../../models/CountdownProperties";
 
 interface IProps extends WithTranslation {
     preset: Preset;
@@ -44,7 +45,7 @@ interface IState {
 class ReplayControls extends React.Component<IProps, IState> {
 
     state = {
-        countdownValue: 500,
+        countdownValue: CountdownProperties.DEFAULT_VALUE,
         currentOffset: 0,
         isRunning: false,
     } as IState;
@@ -120,6 +121,7 @@ class ReplayControls extends React.Component<IProps, IState> {
             nameGuest: '…',
             hostConnected: false,
             guestConnected: false,
+            masterConnected: false,
             hostReady: true,
             guestReady: true,
             preset: this.props.preset,
@@ -148,7 +150,7 @@ class ReplayControls extends React.Component<IProps, IState> {
     private stopCountdown() {
         this.props.setCountdownValue({display: false, value: 0});
         this.clearInterval();
-        this.setState({countdownValue: 500});
+        this.setState({countdownValue: CountdownProperties.DEFAULT_VALUE});
     }
 
     private scheduleDraftEvent(draftViews: DraftViews, event: PlayerEvent | AdminEvent) {
@@ -201,7 +203,7 @@ class ReplayControls extends React.Component<IProps, IState> {
     }
 
     private resetCountdownValue() {
-        this.setState({countdownValue: 500});
+        this.setState({countdownValue: CountdownProperties.DEFAULT_VALUE});
     }
 
     private decrementCountdownValue() {

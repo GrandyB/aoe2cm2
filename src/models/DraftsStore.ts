@@ -13,6 +13,7 @@ import {Listeners} from "../util/Listeners";
 import {logger} from "../util/Logger";
 import {IRecentDraft, IServerState} from "../types";
 import fs from "fs";
+import { CountdownProperties } from "./CountdownProperties";
 
 interface ICountdownValues {
     timeout?: NodeJS.Timeout;
@@ -113,6 +114,9 @@ export class DraftsStore {
                 draft.nameGuest = name;
                 draft.guestConnected = true;
                 break;
+            case Player.MASTER:
+                draft.masterConnected = true;
+                break;
         }
     }
 
@@ -144,6 +148,10 @@ export class DraftsStore {
                 draft.nameGuest = '…';
                 draft.guestConnected = false;
                 draft.guestReady = false;
+                this.pauseCountdown(draftId);
+                break;
+            case Player.MASTER:
+                draft.masterConnected = false;
                 this.pauseCountdown(draftId);
                 break;
         }
@@ -242,6 +250,7 @@ export class DraftsStore {
                 const roomHost: string = `${draftId}-host`;
                 const roomGuest: string = `${draftId}-guest`;
                 const roomSpec: string = `${draftId}-spec`;
+                const roomMaster: string = `${draftId}-master`;
                 let countdown = this.countdowns.get(draftId);
                 if (countdown !== undefined) {
                     const value = countdown.value;
@@ -254,6 +263,7 @@ export class DraftsStore {
                             .in(roomHost)
                             .in(roomGuest)
                             .in(roomSpec)
+                            .in(roomMaster)
                             .emit("countdown", {value, display: true});
                     }
 
@@ -261,7 +271,7 @@ export class DraftsStore {
                         const actListener = Listeners.actListener(this, draftId, (draftId: string, message: DraftEvent) => {
                             this.addDraftEvent(draftId, message);
                             return [];
-                        }, socket, roomHost, roomGuest, roomSpec, true);
+                        }, socket, roomHost, roomGuest, roomSpec, roomMaster, true);
                         const expectedActions = this.getExpectedActions(draftId);
                         if (expectedActions.length > 0) {
                             for (let expectedAction of expectedActions) {
@@ -275,7 +285,7 @@ export class DraftsStore {
 
                 }
             }, 1000);
-            let initialValue = 500;
+            let initialValue = CountdownProperties.DEFAULT_VALUE;
             let countdown = this.countdowns.get(draftId);
             if (countdown !== undefined) {
                 initialValue = countdown.value;
@@ -300,10 +310,12 @@ export class DraftsStore {
             const roomHost: string = `${draftId}-host`;
             const roomGuest: string = `${draftId}-guest`;
             const roomSpec: string = `${draftId}-spec`;
+            const roomMaster: string = `${draftId}-master`;
             countdown.socket.nsp
                 .in(roomHost)
                 .in(roomGuest)
                 .in(roomSpec)
+                .in(roomMaster)
                 .emit("countdown", {value: 0, display: false});
             if (expectedActions.length > 0) {
                 this.startCountdown(draftId, countdown.socket);

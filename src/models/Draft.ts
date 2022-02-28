@@ -11,6 +11,7 @@ class Draft implements IDraftState {
     public nameGuest: string;
     public hostConnected: boolean;
     public guestConnected: boolean;
+    public masterConnected: boolean;
     public hostReady: boolean;
     public guestReady: boolean;
     public readonly preset: Preset;
@@ -24,6 +25,7 @@ class Draft implements IDraftState {
         this.preset = preset;
         this.hostConnected = false;
         this.guestConnected = false;
+        this.masterConnected = false;
         this.hostReady = false;
         this.guestReady = false;
         this.startTimestamp = Date.now();
@@ -39,6 +41,7 @@ class Draft implements IDraftState {
         const draft: Draft = new Draft(source.nameHost, source.nameGuest, source.preset as Preset);
         draft.hostConnected = source.hostConnected;
         draft.guestConnected = source.guestConnected;
+        draft.masterConnected = source.masterConnected;
         draft.hostReady = source.hostReady;
         draft.guestReady = source.guestReady;
         draft.events = this.copyEvents(source.events);

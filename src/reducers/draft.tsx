@@ -12,6 +12,7 @@ export const initialDraftState: IDraftState = {
     guestReady: false,
     hostConnected: false,
     guestConnected: false,
+    masterConnected: false,
     preset: Preset.EMPTY,
     events: [],
     startTimestamp: 0,

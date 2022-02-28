@@ -12,11 +12,11 @@ import AdminEvent from "../models/AdminEvent";
 
 export const Listeners = {
 
-    actListener(draftsStore: DraftsStore, draftId: string, validateAndApply: (draftId: string, message: DraftEvent) => ValidationId[], socket: SocketIO.Socket, roomHost: string, roomGuest: string, roomSpec: string, skipSourceValidation = false) {
+    actListener(draftsStore: DraftsStore, draftId: string, validateAndApply: (draftId: string, message: DraftEvent) => ValidationId[], socket: SocketIO.Socket, roomHost: string, roomGuest: string, roomSpec: string, roomMaster: string, skipSourceValidation = false) {
         return (message: PlayerEvent, fn: (retval: any) => void) => {
             logger.info("Got act message: %s", JSON.stringify(message), {draftId});
 
-            const assignedRole = Util.getAssignedRole(socket, roomHost, roomGuest);
+            const assignedRole = Util.getAssignedRole(socket, roomHost, roomGuest, roomMaster);
 
             if (!skipSourceValidation) {
                 if (assignedRole === Player.NONE) {
@@ -56,17 +56,20 @@ export const Listeners = {
                 socket.nsp
                     .in(roomSpec)
                     .emit("playerEvent", draftViews.getLastEventForSpec());
+                    socket.nsp
+                        .in(roomMaster)
+                        .emit("playerEvent", draftViews.getLastEventForSpec());
                 fn({status: 'ok', validationErrors});
 
                 let adminEventCounter = 0;
                 while (this.nextActionIsAdminEvent(draftsStore, draftId, adminEventCounter)) {
                     adminEventCounter++;
-                    this.scheduleAdminEvent(adminEventCounter, draftsStore, draftId, draftViews, socket, roomHost, roomGuest, roomSpec);
+                    this.scheduleAdminEvent(adminEventCounter, draftsStore, draftId, draftViews, socket, roomHost, roomGuest, roomSpec, roomMaster);
                 }
                 if (draftViews.shouldRestartOrCancelCountdown()) {
                     draftsStore.restartOrCancelCountdown(draftId);
                 }
-                this.finishDraftIfNoFurtherActions(draftViews, socket, draftsStore, draftId, roomHost, roomGuest, roomSpec);
+                this.finishDraftIfNoFurtherActions(draftViews, socket, draftsStore, draftId, roomHost, roomGuest, roomSpec, roomMaster);
             } else {
                 logger.info("Validation yielded errors: %s", JSON.stringify(validationErrors), {draftId});
                 fn({status: 'error', validationErrors});
@@ -80,7 +83,7 @@ export const Listeners = {
         }
         return false;
     },
-    scheduleAdminEvent: function (adminEventCounter: number, draftsStore: DraftsStore, draftId: string, draftViews: DraftViews, socket: SocketIO.Socket, roomHost: string, roomGuest: string, roomSpec: string) {
+    scheduleAdminEvent: function (adminEventCounter: number, draftsStore: DraftsStore, draftId: string, draftViews: DraftViews, socket: SocketIO.Socket, roomHost: string, roomGuest: string, roomSpec: string, roomMaster: string) {
         const expectedActions = draftsStore.getExpectedActions(draftId, adminEventCounter - 1);
         const expectedAction = expectedActions[0];
         if (expectedAction.player === Player.NONE) { // Admin Event
@@ -107,9 +110,15 @@ export const Listeners = {
                             ...expectedAction,
                             events: draftViews.getSpecDraft().events
                         });
+                        socket.nsp
+                            .in(roomMaster)
+                            .emit("adminEvent", {
+                                ...expectedAction,
+                                events: draftViews.getSpecDraft().events
+                            });
                     draftsStore.addDraftEvent(draftId, draftEvent);
                     draftsStore.restartOrCancelCountdown(draftId);
-                    this.finishDraftIfNoFurtherActions(draftViews, socket, draftsStore, draftId, roomHost, roomGuest, roomSpec);
+                    this.finishDraftIfNoFurtherActions(draftViews, socket, draftsStore, draftId, roomHost, roomGuest, roomSpec, roomMaster);
                 }, adminEventCounter * 2000);
             } else {
                 throw new Error("Unknown expected action! " + expectedAction);
@@ -117,7 +126,7 @@ export const Listeners = {
         }
     },
     finishDraftIfNoFurtherActions: function (draftViews: DraftViews, socket: SocketIO.Socket, draftsStore: DraftsStore,
-                                             draftId: string, roomHost: string, roomGuest: string, roomSpec: string) {
+                                             draftId: string, roomHost: string, roomGuest: string, roomSpec: string, roomMaster: string) {
         if (!draftViews.getActualDraft().hasNextAction()) {
             const draft = draftsStore.getDraftOrThrow(draftId);
             draft.startTimestamp = 0;
@@ -126,7 +135,7 @@ export const Listeners = {
             logger.info("Saving draft: %s", JSON.stringify(draft), {draftId});
             fs.writeFile(`data/${draftId}.json`, JSON.stringify(draft), (err) => {
                 logger.info("No further action expected. Disconnecting clients.", {draftId});
-                for (let room of [roomHost, roomGuest, roomSpec]) {
+                for (let room of [roomHost, roomGuest, roomSpec, roomMaster]) {
                     socket.nsp.in(room).clients((error: any, clientIds: string[]) => {
                         if (error) throw error;
                         for (let clientId of clientIds) {

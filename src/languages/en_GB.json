@@ -113,7 +113,8 @@
     "role": {
       "spectator": "Spectator",
       "host": "Host",
-      "guest": "Guest"
+      "guest": "Guest",
+      "master": "Master"
     }
   },
   "HOST": "Host Captain",

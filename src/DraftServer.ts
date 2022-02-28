@@ -179,6 +179,7 @@ export const DraftServer = {
             const roomHost: string = `${draftId}-host`;
             const roomGuest: string = `${draftId}-guest`;
             const roomSpec: string = `${draftId}-spec`;
+            const roomMaster: string = `${draftId}-master`;
 
             if (!draftsStore.has(draftId)) {
                 const path = `data/${draftId}.json`;
@@ -203,6 +204,9 @@ export const DraftServer = {
             } else if (rooms.includes(roomGuest)) {
                 socket.join(roomGuest); // async
                 yourPlayerType = Player.GUEST;
+            } else if (rooms.includes(roomMaster)) {
+                socket.join(roomMaster); // async
+                yourPlayerType = Player.MASTER;
             } else {
                 socket.join(roomSpec); // async
             }
@@ -215,7 +219,7 @@ export const DraftServer = {
                     return;
                 }
                 const role: Player = Util.sanitizeRole(message.role);
-                let assignedRole = Util.getAssignedRole(socket, roomHost, roomGuest);
+                let assignedRole = Util.getAssignedRole(socket, roomHost, roomGuest, roomMaster);
                 const rooms = Object.keys(socket.rooms);
                 if (rooms.includes(roomSpec)) {
                     if (role === Player.HOST && !draftsStore.isPlayerConnected(draftId, role)) {
@@ -230,6 +234,12 @@ export const DraftServer = {
                         socket.leave(roomSpec); // async
                         connectPlayer(draftId, Player.GUEST, message.name);
                         assignedRole = Player.GUEST;
+                    } else if (role === Player.MASTER) {
+                        logger.info("Setting player role to 'MASTER': %s", message.name, {draftId});
+                        connectPlayer(draftId, Player.MASTER, message.name);
+                        socket.join(roomMaster); // async
+                        socket.leave(roomSpec); // async
+                        assignedRole = Player.MASTER;
                     } else {
                         logger.info("Setting role not possible: %s", role, {draftId});
                     }
@@ -255,7 +265,7 @@ export const DraftServer = {
                     socket.emit('message', 'This draft does not exist.');
                     return;
                 }
-                let assignedRole = Util.getAssignedRole(socket, roomHost, roomGuest);
+                let assignedRole = Util.getAssignedRole(socket, roomHost, roomGuest, roomMaster);
                 if (assignedRole === Player.HOST) {
                     logger.info("Setting HOST player name to: %s", message.name, {draftId});
                     setPlayerName(draftId, Player.HOST, message.name);
@@ -307,10 +317,10 @@ export const DraftServer = {
                 });
             });
 
-            socket.on("act", Listeners.actListener(draftsStore, draftId, validateAndApply, socket, roomHost, roomGuest, roomSpec));
+            socket.on("act", Listeners.actListener(draftsStore, draftId, validateAndApply, socket, roomHost, roomGuest, roomSpec, roomMaster));
 
             socket.on('disconnecting', function () {
-                const assignedRole = Util.getAssignedRole(socket, roomHost, roomGuest);
+                const assignedRole = Util.getAssignedRole(socket, roomHost, roomGuest, roomMaster);
                 logger.info("Player disconnected: %s", assignedRole, {draftId});
                 if (!draftsStore.has(draftId)) {
                     return;

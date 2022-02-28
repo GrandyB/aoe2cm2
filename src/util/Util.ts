@@ -150,15 +150,20 @@ export const Util = {
         if (roleRaw === Player.HOST) {
             return Player.HOST;
         }
+        if (roleRaw === Player.MASTER) {
+            return Player.MASTER;
+        }
         return Player.NONE;
     },
 
-    getAssignedRole(socket: SocketIO.Socket, roomHost: string, roomGuest: string): Player {
+    getAssignedRole(socket: SocketIO.Socket, roomHost: string, roomGuest: string, roomMaster: string): Player {
         let assignedRole: Player = Player.NONE;
         if (Object.keys(socket.rooms).includes(roomHost)) {
             assignedRole = Player.HOST;
         } else if (Object.keys(socket.rooms).includes(roomGuest)) {
             assignedRole = Player.GUEST;
+        } else if (Object.keys(socket.rooms).includes(roomMaster)) {
+            assignedRole = Player.MASTER;
         }
         return assignedRole;
     },

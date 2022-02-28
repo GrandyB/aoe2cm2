@@ -8,6 +8,7 @@ export interface IDraftState {
     nameGuest: string;
     hostConnected: boolean;
     guestConnected: boolean;
+    masterConnected: boolean;
     hostReady: boolean;
     guestReady: boolean;
     preset?: Preset;

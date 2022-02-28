@@ -66,6 +66,21 @@ class RoleModal extends React.Component<IProps, object> {
                                         </div>
                                     </div>
                                 </button>
+                                <button className="role-button button is-light" onClick={() => {
+                                    this.props.setRoleCallback(Player.MASTER)
+                                }} disabled={ this.props.hostConnected || this.props.guestConnected}>
+                                    <div className="role">
+                                        <div className="box-content is-visible">
+                                            <div className="stretchy-wrapper">
+                                                <div className="stretchy-image">
+                                                    <img src="/images/role_master.png" alt="Master"/>
+                                                </div>
+                                                <div className="stretchy-text"><Trans>rolemodal.role.master</Trans>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </button>
                             </div>
                             <hr/>
                             <p><Trans>rolemodal.draftUrlCallToAction</Trans></p>

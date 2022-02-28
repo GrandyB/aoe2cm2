@@ -141,7 +141,7 @@ class Messages extends React.Component<IProps, object> {
         const firstTurn = this.getFirstTurnOfParallelTurn() as Turn;
         const secondTurn = this.getSecondTurnOfParallelTurn() as Turn;
         const nextTurn = this.getNextTurn() as Turn;
-        if (this.props.whoAmI === Player.NONE) {
+        if (this.props.whoAmI === Player.NONE || this.props.whoAmI === Player.MASTER) {
             if (nextTurn.parallel) {
                 return this.messageForTurns(firstTurn, secondTurn);
             } else {
@@ -241,7 +241,7 @@ class Messages extends React.Component<IProps, object> {
         if (turn.player !== turn.executingPlayer) {
             forOpponent = true;
         }
-        if (turn.player === Player.NONE) {
+        if (turn.player === Player.NONE || turn.player === Player.MASTER) {
             const action = turn.action.toString();
             return (
                 <div>
@@ -288,7 +288,7 @@ class Messages extends React.Component<IProps, object> {
                     );
             }
         } else {
-            if (this.props.whoAmI === Player.NONE) {
+            if (this.props.whoAmI === Player.NONE || this.props.whoAmI === Player.MASTER) {
                 const playerName = this.getPlayerName(turn);
                 switch (turn.action) {
                     case Action.PICK:

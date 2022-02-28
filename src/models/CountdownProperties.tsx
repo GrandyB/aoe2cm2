@@ -1,4 +1,5 @@
 export class CountdownProperties {
+    public static DEFAULT_VALUE:number = 30;
     private countdownValue: number;
     interval: NodeJS.Timeout | null;
 
@@ -8,7 +9,7 @@ export class CountdownProperties {
     }
 
     public resetValue() {
-        this.countdownValue = 500;
+        this.countdownValue = CountdownProperties.DEFAULT_VALUE;
     }
 
     public decrement() {
