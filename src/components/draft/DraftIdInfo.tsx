@@ -10,6 +10,7 @@ interface IProps extends WithTranslation {
     nextAction: number;
     hostReady: boolean;
     guestReady: boolean;
+    masterReady: boolean;
 }
 
 class DraftIdInfo extends React.Component<IProps, object> {
@@ -40,7 +41,7 @@ class DraftIdInfo extends React.Component<IProps, object> {
     }
 
     private hasDraftStarted() {
-        return this.props.hostReady && this.props.guestReady;
+        return (this.props.hostReady && this.props.guestReady) || this.props.masterReady;
     }
 
 }

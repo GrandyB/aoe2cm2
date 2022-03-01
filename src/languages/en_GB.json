@@ -103,6 +103,11 @@
     "captainName": "Captain Name",
     "randomizeName": "Randomize name"
   },
+  "doubleModal": {
+    "header": "Set player names",
+    "callToAction": "As the master role, you are able to edit the names of both players:",
+    "setNames": "Set Names"
+  },
   "rolemodal": {
     "header": "Choose your role",
     "draftUrlCallToAction": "Send this url to the other captain:",

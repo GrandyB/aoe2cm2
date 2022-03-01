@@ -115,8 +115,6 @@ export class DraftsStore {
                 draft.guestConnected = true;
                 break;
             case Player.MASTER:
-                draft.hostReady = true;
-                draft.guestReady = true;
                 draft.masterConnected = true;
                 break;
         }
@@ -153,8 +151,6 @@ export class DraftsStore {
                 this.pauseCountdown(draftId);
                 break;
             case Player.MASTER:
-                draft.hostReady = false;
-                draft.guestReady = false;
                 draft.masterConnected = false;
                 this.pauseCountdown(draftId);
                 break;
@@ -176,6 +172,8 @@ export class DraftsStore {
                 return draft.hostConnected;
             case Player.GUEST:
                 return draft.guestConnected;
+            case Player.MASTER:
+                return draft.masterConnected;
         }
         return false;
     }
@@ -191,6 +189,10 @@ export class DraftsStore {
             case Player.GUEST:
                 previousReadyValue = draft.guestReady;
                 draft.guestReady = true;
+                break;
+            case Player.MASTER:
+                previousReadyValue = draft.masterReady;
+                draft.masterReady = true;
                 break;
         }
         return previousReadyValue;

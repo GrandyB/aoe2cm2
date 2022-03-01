@@ -34,7 +34,7 @@ export const SocketUtil = {
 
         socket.on("player_set_role", (data: IPlayerWithNameMessage) => {
             console.log("player_set_role", data);
-            if (data.playerType === Player.HOST || data.playerType === Player.GUEST) {
+            if (data.playerType === Player.HOST || data.playerType === Player.GUEST || data.playerType == Player.MASTER) {
                 storeAPI.dispatch({
                     type: ServerActions.SET_PLAYER_CONNECTED,
                     player: data.playerType,
@@ -56,7 +56,7 @@ export const SocketUtil = {
 
         socket.on("player_ready", (data: IPlayerWithNameMessage) => {
             console.log("player_ready", data);
-            if (data.playerType === Player.HOST || data.playerType === Player.GUEST) {
+            if (data.playerType === Player.HOST || data.playerType === Player.GUEST || data.playerType === Player.MASTER) {
                 storeAPI.dispatch({type: ServerActions.SET_READY, player: data.playerType} as ISetReady);
             }
         });

@@ -11,6 +11,7 @@ import {IDraftConfig} from "../../types/IDraftConfig";
 import {Trans, WithTranslation, withTranslation} from "react-i18next";
 import KeyboardBackspaceIcon from "mdi-react/KeyboardBackspaceIcon";
 import Modal from "../../containers/Modal";
+import ModalDouble from "../../containers/ModalDouble";
 import NameGenerator from "../../util/NameGenerator";
 import {Link, withRouter} from "react-router-dom";
 import RoleModal from "../../containers/RoleModal";
@@ -28,6 +29,7 @@ interface IProps extends WithTranslation, RouteComponentProps<any> {
     hostConnected: boolean;
     guestConnected: boolean;
     masterConnected: boolean;
+    masterReady: boolean;
     whoAmI?: Player;
     ownName: string | null;
     preset: Preset;
@@ -44,6 +46,7 @@ interface IProps extends WithTranslation, RouteComponentProps<any> {
     triggerDisconnect?: () => void;
     showRoleModal: () => void;
     showNameModal: () => void;
+    showNamesModal: () => void;
     setOwnRole: (role: Player) => void;
     setCountdownValue: (values: ICountdownValues) => void;
     setEvents: (value: { player: Player, action: ModelAction, events: DraftEvent[] }) => void;
@@ -75,20 +78,33 @@ class Draft extends React.Component<IProps, IState> {
     }
 
     componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any): void {
+        console.log("Draft#Component: I am a " + this.props.whoAmI);
         if (this.props.whoAmI === undefined) {
             if (!this.props.hostConnected || !this.props.guestConnected) {
+                console.log("Draft#Component: neither host nor guest is connected");
                 this.props.showRoleModal();
             } else {
+                console.log("Draft#Component: host or guest is connected");
                 this.props.setOwnRole(Player.NONE);
                 this.setState({joined: true});
             }
+        } else if (this.props.whoAmI === Player.MASTER && !this.state.joined) {
+            console.log("Draft#Component: master is connected");
+            this.props.triggerSetRole("Master", Player.MASTER);
+            this.props.showNamesModal();
+            this.setState({joined: true});
         } else if (this.props.whoAmI !== Player.NONE && !this.state.joined) {
+            
+            console.log("Draft#Component: an unjoined spectator");
             let username: string | null = NameGenerator.getNameFromLocalStorage(this.props.ownName);
             console.log("componentDidMount", this.props.triggerSetRole, username);
+
             if (username !== null) {
+                console.log("Draft#Component: setting role to " + this.props.whoAmI);
                 this.props.triggerSetRole(username, this.props.whoAmI);
                 this.setState({joined: true});
             } else {
+                console.log("Draft#Component: username is null");
                 this.props.showNameModal();
             }
         }
@@ -175,6 +191,7 @@ class Draft extends React.Component<IProps, IState> {
             <>
             <section className={className}>
                 <Modal inDraft={true}/>
+                <ModalDouble/>
                 <RoleModal/>
                 <div id="container" className="container is-fluid">
                     <div className="columns is-mobile">

@@ -36,11 +36,6 @@ export interface ISetReady {
     type: ServerActions.SET_READY
 }
 
-export interface IChangeOwnName {
-    type: Actions.SET_OWN_NAME,
-    value: string
-}
-
 export interface ISetOwnRole {
     type: Actions.SET_OWN_ROLE,
     value: Player
@@ -52,9 +47,26 @@ export interface ISetRole {
     role: Player
 }
 
+export interface IChangeOwnName {
+    type: Actions.SET_OWN_NAME,
+    value: string
+}
+
 export interface ISetName {
     type: ClientActions.SEND_SET_NAME,
     name: string
+}
+
+export interface IChangePlayerNames {
+    type: Actions.SET_PLAYER_NAMES,
+    hostName: string,
+    guestName: string
+}
+
+export interface ISetPlayerNames {
+    type: ClientActions.SEND_SET_PLAYER_NAMES,
+    hostName: string,
+    guestName: string
 }
 
 export interface ISendReady {
@@ -107,6 +119,10 @@ export interface IDisconnect {
 
 export interface IShowNameModal {
     type: Actions.SHOW_NAME_MODAL
+}
+
+export interface IShowDoubleNameModal {
+    type: Actions.SHOW_DOUBLE_NAME_MODAL
 }
 
 export interface IShowRoleModal {
@@ -167,6 +183,7 @@ export type DraftAction = IConnectPlayer
     | IApplyConfig
     | ISetRole
     | ISetName
+    | ISetPlayerNames
     | ISendReady
     | IClickOnCiv
     | ISetEvents
@@ -200,8 +217,10 @@ export type IconStyleAction = ISetIconStyle;
 export type ColorSchemeAction = ISetColorScheme;
 
 export type ModalAction = IShowNameModal
+    | IShowDoubleNameModal
     | IShowRoleModal
     | IChangeOwnName
+    | IChangePlayerNames
     | ISetOwnRole;
 
 export type PresetEditorAction = ISetEditorPreset
@@ -278,6 +297,22 @@ export function setName(name: string): ISetName {
     }
 }
 
+export function changePlayerNames(hostName: string, guestName: string): IChangePlayerNames {
+    return {
+        hostName,
+        guestName,
+        type: Actions.SET_PLAYER_NAMES
+    }
+}
+
+export function setPlayerNames(hostName: string, guestName: string): ISetPlayerNames {
+    return {
+        hostName,
+        guestName,
+        type: ClientActions.SEND_SET_PLAYER_NAMES
+    }
+}
+
 export function sendReady(): ISendReady {
     return {
         type: ClientActions.SEND_READY
@@ -287,6 +322,11 @@ export function sendReady(): ISendReady {
 export function showNameModal(): IShowNameModal {
     return {
         type: Actions.SHOW_NAME_MODAL
+    }
+}
+export function showDoubleNameModal(): IShowDoubleNameModal {
+    return {
+        type: Actions.SHOW_DOUBLE_NAME_MODAL
     }
 }
 

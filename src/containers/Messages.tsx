@@ -10,6 +10,8 @@ export function mapStateToProps(state: ApplicationState) {
         whoAmI: state.ownProperties.whoAmI,
         hostReady: state.draft.hostReady,
         guestReady: state.draft.guestReady,
+        masterReady: state.draft.masterReady,
+        masterConnected: state.draft.masterConnected,
         nameHost: state.draft.nameHost,
         nameGuest: state.draft.nameGuest,
         preset: state.draft.preset,

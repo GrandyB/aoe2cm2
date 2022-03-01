@@ -124,6 +124,7 @@ class ReplayControls extends React.Component<IProps, IState> {
             masterConnected: false,
             hostReady: true,
             guestReady: true,
+            masterReady: false,
             preset: this.props.preset,
             events: [...this.props.replayEvents.slice(0, this.props.draftEvents.length)],
             startTimestamp: 0

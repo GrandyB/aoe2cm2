@@ -17,7 +17,9 @@ export function mapStateToProps(state: ApplicationState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<actions.Action>, ownProps: any) {
     return {
-        setRoleCallback: (role: Player) => dispatch(actions.setOwnRole(role))
+        setRoleCallback: (role: Player) => {
+            dispatch(actions.setOwnRole(role));
+        }
     };
 }
 

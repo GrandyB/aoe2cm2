@@ -11,6 +11,7 @@ export interface IDraftState {
     masterConnected: boolean;
     hostReady: boolean;
     guestReady: boolean;
+    masterReady: boolean;
     preset?: Preset;
     events: DraftEvent[];
     startTimestamp: number;
@@ -48,6 +49,7 @@ export interface ICountdownState {
 
 export interface IModalState {
     showModal: boolean;
+    showDoubleNameModal: boolean;
     showRoleModal: boolean;
 }
 

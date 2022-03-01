@@ -14,6 +14,7 @@ class Draft implements IDraftState {
     public masterConnected: boolean;
     public hostReady: boolean;
     public guestReady: boolean;
+    public masterReady: boolean;
     public readonly preset: Preset;
     public nextAction: number = 0;
     public events: DraftEvent[] = [];
@@ -28,6 +29,7 @@ class Draft implements IDraftState {
         this.masterConnected = false;
         this.hostReady = false;
         this.guestReady = false;
+        this.masterReady = false;
         this.startTimestamp = Date.now();
     }
 
@@ -44,6 +46,7 @@ class Draft implements IDraftState {
         draft.masterConnected = source.masterConnected;
         draft.hostReady = source.hostReady;
         draft.guestReady = source.guestReady;
+        draft.masterReady = source.masterReady;
         draft.events = this.copyEvents(source.events);
         draft.startTimestamp = source.startTimestamp;
         draft.nextAction = source.events.length;
@@ -65,7 +68,7 @@ class Draft implements IDraftState {
     }
 
     public static playersAreReady(draft: IDraftState) {
-        return draft.hostReady && draft.guestReady;
+        return (draft.hostReady && draft.guestReady) || draft.masterReady;
     }
 
     public hasNextAction(offset: number = 0): boolean {
@@ -73,7 +76,7 @@ class Draft implements IDraftState {
     }
 
     public draftCanBeStarted(): boolean {
-        return this.hostReady && this.guestReady;
+        return (this.hostReady && this.guestReady) || this.masterReady;
     }
 
     public getExpectedActions(offset: number = 0): Turn[] {

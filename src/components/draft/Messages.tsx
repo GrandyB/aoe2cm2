@@ -12,6 +12,8 @@ interface IProps extends WithTranslation {
     whoAmI: Player | undefined,
     hostReady: boolean,
     guestReady: boolean,
+    masterReady: boolean,
+    masterConnected: boolean,
     nameHost: string,
     nameGuest: string,
     preset: Preset | undefined,
@@ -30,7 +32,11 @@ const STEAL = <span className='has-text-warning'><b>Steal</b></span>;
 class Messages extends React.Component<IProps, object> {
     public render() {
 
-        if (!this.props.hostReady || !this.props.guestReady) {
+        // If master is ready; go through
+        // If master is not ready; wait
+        // If no master, then show waiting if host or guest aren't ready
+        console.log(`master: ${this.props.masterReady}, host: ${this.props.hostReady}, guest: ${this.props.guestReady}`);
+        if (!this.props.masterReady || (!this.props.hostReady || !this.props.guestReady)) {
             return this.handleWaitingForPlayersToGetReady();
         }
 

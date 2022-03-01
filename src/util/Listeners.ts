@@ -56,9 +56,9 @@ export const Listeners = {
                 socket.nsp
                     .in(roomSpec)
                     .emit("playerEvent", draftViews.getLastEventForSpec());
-                    socket.nsp
-                        .in(roomMaster)
-                        .emit("playerEvent", draftViews.getLastEventForSpec());
+                socket.nsp
+                    .in(roomMaster)
+                    .emit("playerEvent", draftViews.getLastEventForSpec());
                 fn({status: 'ok', validationErrors});
 
                 let adminEventCounter = 0;

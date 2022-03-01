@@ -14,6 +14,7 @@ import Preset from "./models/Preset";
 import {Listeners} from "./util/Listeners";
 import * as fs from "fs";
 import {logger} from "./util/Logger";
+import {ISetPlayerNamesMessage} from "./types/ISetPlayerNamesMessage";
 import {ISetNameMessage} from "./types/ISetNameMessage";
 import {PresetUtil} from "./util/PresetUtil";
 import {IServerState} from "./types";
@@ -210,6 +211,7 @@ export const DraftServer = {
             } else {
                 socket.join(roomSpec); // async
             }
+            logger.info("Connection is for a " + yourPlayerType);
 
             socket.on("set_role", (message: ISetRoleMessage, fn: (dc: IDraftConfig) => void) => {
                 logger.info("Player wants to set own role: %s", JSON.stringify(message), {draftId});
@@ -256,6 +258,39 @@ export const DraftServer = {
                     ...draftsStore.getDraftViewsOrThrow(draftId).getDraftForPlayer(assignedRole),
                     yourPlayerType: assignedRole,
                 });
+            });
+
+            socket.on("set_player_names", (message: ISetPlayerNamesMessage, fn: () => void) => {
+                logger.info("Player wants to set all names: %s", JSON.stringify(message), {draftId});
+                if (!draftsStore.has(draftId)) {
+                    logger.warn("Draft does not exist", {draftId});
+                    socket.emit('message', 'This draft does not exist.');
+                    return;
+                }
+                let assignedRole = Util.getAssignedRole(socket, roomHost, roomGuest, roomMaster);
+                if (assignedRole === Player.MASTER) {
+                    logger.info("Setting player names - host: '%s', guest: '%s'", message.hostName, message.guestName, {draftId});
+                    setPlayerName(draftId, Player.HOST, message.hostName);
+                    setPlayerName(draftId, Player.GUEST, message.guestName);
+
+                    socket.nsp
+                        .in(roomHost)
+                        .in(roomGuest)
+                        .in(roomSpec)
+                        .in(roomMaster)
+                        .emit("player_set_name", {name: message.hostName, playerType: Player.HOST});
+                    socket.nsp
+                        .in(roomHost)
+                        .in(roomGuest)
+                        .in(roomSpec)
+                        .in(roomMaster)
+                        .emit("player_set_name", {name: message.guestName, playerType: Player.GUEST});
+                    fn();
+                    draftsStore.setPlayerReady(draftId, Player.MASTER);
+                } else {
+                    logger.info("Player not a MASTER. No action taken.", {draftId});
+                    return;
+                }
             });
 
             socket.on("set_name", (message: ISetNameMessage, fn: () => void) => {

@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {applyMiddleware, createStore, Store} from 'redux';
-import {Action, IApplyConfig, IClickOnCiv, ISetName, ISetRole} from "./actions";
+import {Action, IApplyConfig, IClickOnCiv, ISetName, ISetPlayerNames, ISetRole} from "./actions";
 import Footer from "./components/menu/Footer";
 import NavBar from "./components/menu/NavBar";
 import Menu from "./components/menu/Menu";
@@ -65,6 +65,18 @@ const createMySocketMiddleware = () => {
                 }
                 const setName = action as ISetName;
                 socket.emit('set_name', {name: setName.name}, () => {
+                });
+                return;
+            }
+
+            if (action.type === ClientActions.SEND_SET_PLAYER_NAMES) {
+                console.log("SEND_SET_PLAYER_NAMES", SocketUtil.initSocketIfFirstUse, socket, storeAPI);
+                socket = SocketUtil.initSocketIfFirstUse(socket, storeAPI) as SocketIOClient.Socket;
+                if (socket.disconnected) {
+                    return;
+                }
+                const setName = action as ISetPlayerNames;
+                socket.emit('set_player_names', {hostName: setName.hostName, guestName: setName.guestName}, () => {
                 });
                 return;
             }

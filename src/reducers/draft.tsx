@@ -10,6 +10,7 @@ export const initialDraftState: IDraftState = {
     nameGuest: "…",
     hostReady: false,
     guestReady: false,
+    masterReady: false,
     hostConnected: false,
     guestConnected: false,
     masterConnected: false,
@@ -48,10 +49,13 @@ export const draftReducer = (state: IDraftState = initialDraftState, action: Dra
             }
         case ServerActions.SET_READY:
             console.log(ServerActions.SET_READY, action);
+            console.log("Draft reducer: setReady for: " + action.player);
             if (action.player === Player.HOST) {
                 return {...state, hostReady: true};
             } else if (action.player === Player.GUEST) {
                 return {...state, guestReady: true};
+            } else if (action.player === Player.MASTER) {
+                return {...state, masterReady: true};
             } else {
                 return state;
             }
@@ -67,6 +71,7 @@ export const draftReducer = (state: IDraftState = initialDraftState, action: Dra
                 guestConnected: action.value.guestConnected,
                 hostReady: action.value.hostReady,
                 guestReady: action.value.guestReady,
+                masterReady: action.value.masterReady,
                 preset
             };
         case ServerActions.SET_EVENTS:

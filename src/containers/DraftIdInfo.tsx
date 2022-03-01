@@ -11,6 +11,7 @@ export function mapStateToProps(state: ApplicationState) {
         preset: state.draft.preset as Preset,
         hostReady: state.draft.hostReady,
         guestReady: state.draft.guestReady,
+        masterReady: state.draft.masterReady
     }
 }
 
