@@ -37,6 +37,7 @@ class Turn {
     public static readonly REVEAL_BANS = new Turn(Player.NONE, Action.REVEAL_BANS, Exclusivity.GLOBAL);
     public static readonly REVEAL_SNIPES = new Turn(Player.NONE, Action.REVEAL_SNIPES, Exclusivity.GLOBAL);
     public static readonly REVEAL_ALL = new Turn(Player.NONE, Action.REVEAL_ALL, Exclusivity.GLOBAL);
+    public static readonly DEFAULT_PICK = new Turn(Player.NONE, Action.DEFAULT_PICK, Exclusivity.GLOBAL);
 
 
     public readonly player: Player;

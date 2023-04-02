@@ -4,6 +4,7 @@ import {DraftsStore} from "../models/DraftsStore";
 import {ValidationId} from "../constants/ValidationId";
 import {Util} from "./Util";
 import Player from "../constants/Player";
+import Action from '../constants/Action';
 import ActionType, {actionTypeFromAction} from "../constants/ActionType";
 import DraftViews from "../models/DraftViews";
 import fs from "fs";
@@ -93,36 +94,40 @@ export class ActListener {
         const expectedActions = draftsStore.getExpectedActions(draftId, adminEventCounter - 1);
         const expectedAction = expectedActions[0];
         if (expectedAction.player === Player.NONE) { // Admin Event
+            const draftEvent = new AdminEvent(expectedAction.player, expectedAction.action);
+            let action = () => {};
             if (actionTypeFromAction(expectedAction.action) === ActionType.REVEAL) {
-                const draftEvent = new AdminEvent(expectedAction.player, expectedAction.action);
-                setTimeout(() => {
-                    logger.info('Executing admin event: %s', JSON.stringify(draftEvent), {draftId});
-                    draftViews.reveal(expectedAction.action);
-                    socket.nsp
-                        .in(roomHost)
-                        .emit("adminEvent", {
-                            ...expectedAction,
-                            events: draftViews.getHostDraft().events
-                        });
-                    socket.nsp
-                        .in(roomGuest)
-                        .emit("adminEvent", {
-                            ...expectedAction,
-                            events: draftViews.getGuestDraft().events
-                        });
-                    socket.nsp
-                        .in(roomSpec)
-                        .emit("adminEvent", {
-                            ...expectedAction,
-                            events: draftViews.getSpecDraft().events
-                        });
-                    draftsStore.addDraftEvent(draftId, draftEvent);
-                    draftsStore.restartOrCancelCountdown(draftId, this.dataDirectory);
-                    this.finishDraftIfNoFurtherActions(draftViews, socket, draftsStore, draftId, roomHost, roomGuest, roomSpec);
-                }, adminEventCounter * 2000);
+                action = () => draftViews.reveal(expectedAction.action);
+            } else if (expectedAction.action === Action.DEFAULT_PICK) {
+                action = () => logger.info('scheduleAdminEvent: this is where we would do the default pick', expectedAction);
             } else {
-                throw new Error("Unknown expected action! " + expectedAction);
+                throw new Error("Unknown expected action! " + JSON.stringify(expectedAction));
             }
+            setTimeout(() => {
+                logger.info('Executing admin event: %s', JSON.stringify(draftEvent), {draftId});
+                action();
+                socket.nsp
+                    .in(roomHost)
+                    .emit("adminEvent", {
+                        ...expectedAction,
+                        events: draftViews.getHostDraft().events
+                    });
+                socket.nsp
+                    .in(roomGuest)
+                    .emit("adminEvent", {
+                        ...expectedAction,
+                        events: draftViews.getGuestDraft().events
+                    });
+                socket.nsp
+                    .in(roomSpec)
+                    .emit("adminEvent", {
+                        ...expectedAction,
+                        events: draftViews.getSpecDraft().events
+                    });
+                draftsStore.addDraftEvent(draftId, draftEvent);
+                draftsStore.restartOrCancelCountdown(draftId, this.dataDirectory);
+                this.finishDraftIfNoFurtherActions(draftViews, socket, draftsStore, draftId, roomHost, roomGuest, roomSpec);
+            }, adminEventCounter * 2000);
         }
     }
 

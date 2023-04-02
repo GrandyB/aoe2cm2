@@ -15,5 +15,7 @@ export enum ValidationId {
     VLD_909 = 'VLD_909',
     VLD_910 = 'VLD_910',
     VLD_911 = 'VLD_911',
+    VLD_912 = 'VLD_912',
+    VLD_913 = 'VLD_913',
     VLD_999 = 'VLD_999',
 }

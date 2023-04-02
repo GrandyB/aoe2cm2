@@ -64,7 +64,7 @@ export class PresetValidation {
         for (let turn of preset.turns) {
             if (turn.action === Action.BAN && turn.hidden) {
                 needsReveal = true;
-            } else if (turn.action === Action.REVEAL_ALL || turn.action === Action.REVEAL_BANS) {
+            } else if (turn.action === Action.REVEAL_ALL || turn.action === Action.REVEAL_BANS || turn.action === Action.DEFAULT_PICK) {
                 needsReveal = false;
             } else if (turn.action === Action.PICK && needsReveal) {
                 return false;
@@ -137,6 +137,35 @@ export class PresetValidation {
         return true;
     });
 
+    // "VLD_912": "The default pick turn can only be the last action in the preset"
+    public static readonly VLD_912: PresetValidation = new PresetValidation(ValidationId.VLD_912, (preset: Preset) => {
+        let found = false;
+        for (let turn of preset.turns) {
+            if (found) {
+                return false;
+            }
+            found = turn.action === Action.DEFAULT_PICK;
+        }
+        return true;
+    });
+
+    // "VLD_913": "The default pick turn is not valid if there can be multiple (or no) remaining drafting options"
+    public static readonly VLD_913: PresetValidation = new PresetValidation(ValidationId.VLD_913, (preset: Preset) => {
+        let pickAndBanCount = 0;
+        let hasDefaultPick = false;
+        for (let turn of preset.turns) {
+            if (turn.action === Action.PICK || turn.action === Action.BAN) {
+                pickAndBanCount++;
+            }
+            if (turn.action === Action.DEFAULT_PICK) {
+                hasDefaultPick = true;
+            }
+        }
+        let numDraftOptions = preset.options.length;
+
+        return !hasDefaultPick || numDraftOptions - pickAndBanCount === 1;
+    });
+
     public static readonly ALL: PresetValidation[] = [
         PresetValidation.VLD_901,
         PresetValidation.VLD_902,
@@ -149,6 +178,8 @@ export class PresetValidation {
         PresetValidation.VLD_909,
         PresetValidation.VLD_910,
         PresetValidation.VLD_911,
+        PresetValidation.VLD_912,
+        PresetValidation.VLD_913,
     ];
 
     private readonly validationId: ValidationId;

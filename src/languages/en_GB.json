@@ -189,6 +189,8 @@
     "VLD_909": "The given presetId is invalid",
     "VLD_910": "Your DraftOptions contain an invalid DraftOption id",
     "VLD_911": "Your DraftOptions ids are not unique, probably because two have the same name",
+    "VLD_912": "The default pick turn can only be the last action in the preset",
+    "VLD_913": "The default pick turn is not valid if there can be multiple (or no) remaining drafting options",
     "VLD_999": "Something went very wrong during validation"
   },
   "menu": {

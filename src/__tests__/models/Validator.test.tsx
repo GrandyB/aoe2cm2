@@ -385,6 +385,54 @@ it('VLD_911: draft option names not unique but ids unique', () => {
     expect(errors).toEqual([]);
 });
 
+it('VLD_912: default pick invalid if not the last turn', () => {
+    let preset = new Preset("test",
+        [new DraftOption('1', 'name 1'), new DraftOption('2', 'name 2')],
+        [Turn.DEFAULT_PICK, Turn.HOST_PICK]);
+    const errors: ValidationId[] = Validator.validatePreset(preset);
+    expect(errors).toEqual([ValidationId.VLD_912]);
+});
+
+it('VLD_912: default pick can be valid if only one turn', () => {
+    let preset = new Preset("test",
+        [new DraftOption('1', 'name 1')],
+        [Turn.DEFAULT_PICK]);
+    const errors: ValidationId[] = Validator.validatePreset(preset);
+    expect(errors).toEqual([]);
+});
+
+it('VLD_912: default pick is valid if last turn of multi-option/turn preset', () => {
+    let preset = new Preset("test",
+        [new DraftOption('1', 'name 1'), new DraftOption('2', 'name 2'), new DraftOption('3', 'name 3'), new DraftOption('4', 'name 4'), new DraftOption('5', 'name 5')],
+        [Turn.HOST_BAN, Turn.GUEST_BAN, Turn.HOST_PICK, Turn.GUEST_PICK, Turn.DEFAULT_PICK]);
+    const errors: ValidationId[] = Validator.validatePreset(preset);
+    expect(errors).toEqual([]);
+});
+
+it('VLD_913: default pick has multiple remaining options', () => {
+    let preset = new Preset("test", 
+        [new DraftOption('1', 'name 1'), new DraftOption('2', 'name 2'), new DraftOption('3', 'name 3'), new DraftOption('4', 'name 4')],
+        [Turn.HOST_PICK, Turn.GUEST_PICK, Turn.DEFAULT_PICK]);
+    const errors: ValidationId[] = Validator.validatePreset(preset);
+    expect(errors).toEqual([ValidationId.VLD_913]);
+});
+
+it('VLD_913: default pick has no options remaining', () => {
+    let preset = new Preset("test", 
+        [new DraftOption('1', 'name 1'), new DraftOption('2', 'name 2')],
+        [Turn.HOST_PICK, Turn.GUEST_PICK, Turn.DEFAULT_PICK]);
+    const errors: ValidationId[] = Validator.validatePreset(preset);
+    expect(errors).toEqual([ValidationId.VLD_913]);
+});
+
+it('VLD_913: default pick has exactly one option remaining', () => {
+    let preset = new Preset("test", 
+        [new DraftOption('1', 'name 1'), new DraftOption('2', 'name 2'), new DraftOption('3', 'name 3')],
+        [Turn.HOST_PICK, Turn.GUEST_PICK, Turn.DEFAULT_PICK]);
+    const errors: ValidationId[] = Validator.validatePreset(preset);
+    expect(errors).toEqual([]);
+});
+
 it('VLD_999: totally wrong preset format', () => {
     let preset = {absolute: "garbage"} as unknown as Preset;
     const errors: ValidationId[] = Validator.validatePreset(preset);

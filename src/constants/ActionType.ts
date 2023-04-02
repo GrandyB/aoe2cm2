@@ -12,6 +12,7 @@ enum ActionType {
 export function actionTypeFromAction(action: Action) {
     switch (action) {
         case Action.PICK:
+        case Action.DEFAULT_PICK:
             return ActionType.PICK;
         case Action.BAN:
             return ActionType.BAN;
